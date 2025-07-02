@@ -1,0 +1,51 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "API PAYMENT ACCOUNT",
+    "description": "Une API simple ",
+    "version": "1.0"
+  },
+  "basePath": "/",
+  "paths": {
+    "/account": {
+      "get": {
+        "tags":["Api"],
+        "summary": "get accounts",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Liste des comptes",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account/create": {
+      "post": {
+        "tags":["Api"],
+        "summary": "create account",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "account created",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+} } 

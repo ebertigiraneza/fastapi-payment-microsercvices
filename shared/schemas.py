@@ -1,0 +1,23 @@
+# shared/schemas.py
+from pydantic import BaseModel
+from typing import Optional
+
+class WalletCreate(BaseModel):
+    address: str
+    password: str
+
+class WalletResponse(BaseModel):
+    address: str
+    balance: float
+
+    class Config:
+        from_attributes = True
+
+class BalanceResponse(BaseModel):
+    address: str
+    new_balance: float
+    message: Optional[str] = "Success"     
+    
+class WalletAuth(BaseModel):
+    address: str
+    wallet_password: str    

@@ -1,0 +1,40 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "API PAYMENT AUTH",
+    "description": "Une API simple D'authentification ",
+    "version": "1.0"
+  },
+  "basePath": "/",
+  "paths": {
+    "/account/authenticate": {
+      "post": {
+        "tags":["Api"],
+        "summary": "get authenticate",
+        "parameters": [
+          {
+            "name": "password",
+            "in": "body",
+            "description": "password for authentication",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "authentication",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  
+    
+} } 
