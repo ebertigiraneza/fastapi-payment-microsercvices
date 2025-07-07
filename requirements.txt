@@ -5,3 +5,4 @@ sqlalchemy
 bcrypt
 passlib
 databases
+aiosqlite
