@@ -1,27 +1,23 @@
-import subprocess
+# run_all.py
+
+
+import uvicorn
+from multiprocessing import Process
 import time
 
-services = [
-    ("wallet.main:app", 8001),
-    ("auth.main:app", 8002),
-    ("deposit.main:app", 8003),
-    ("withdraw.main:app", 8004)
-]
+def run_app(app: str, port: int):
+    uvicorn.run(app, host="0.0.0.0", port=port, workers=1)
 
-# Démarrer le gateway
-subprocess.Popen([
-    "uvicorn", 
-    "main:main_app",
-    "--host", "0.0.0.0",
-    "--port", "8000"
-])
+if __name__ == "__main__":
+    # Service principal (doit être sur le port Render par défaut)
+    Process(target=run_app, args=("main:app", 8000)).start()
+    
+    # Microservices (ports internes)
+    Process(target=run_app, args=("wallet.main:app", 8001)).start()
+    Process(target=run_app, args=("authentification.main:app", 8002)).start()
+    Process(target=run_app, args=("deposit.main:app", 8003)).start()
+    Process(target=run_app, args=("withdraw.main:app", 8004)).start()
 
-# Démarrer les microservices
-for app, port in services:
-    subprocess.Popen([
-        "uvicorn",
-        app,
-        "--host", "0.0.0.0",
-        "--port", str(port)
-    ])
-    time.sleep(1)
+    # Garder le processus principal actif
+    while True:
+        time.sleep(3600)  # 1 heure    

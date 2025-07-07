@@ -3,10 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from importlib import import_module
 import uvicorn
 
-main_app = FastAPI()
+app = FastAPI()
 
 # Autorise les requêtes CORS si nécessaire
-main_app.add_middleware(
+app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_methods=["*"],
@@ -23,12 +23,12 @@ services = {
 
 for name, config in services.items():
     module = import_module(f"{name}.main")
-    main_app.mount(config["path"], module.app)
+    app.mount(config["path"], module.app)
     print(f"Mounted {name} at {config['path']}")
 
-@main_app.get("/")
+@app.get("/")
 def read_root():
     return {"message": "API Gateway", "services": list(services.keys())}
 
 if __name__ == "__main__":
-    uvicorn.run(main_app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
