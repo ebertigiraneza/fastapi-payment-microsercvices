@@ -1,33 +1,29 @@
-# run_all.py              
-    
-import uvicorn
-from multiprocessing import Process
-
-def run_service(app: str, port: int):
-    uvicorn.run(app, host="0.0.0.0", port=port, reload=False, workers=1)
+import subprocess
+import time
 
 services = [
-    ("wallet.main:app", 8000),
-    ("authentification.main:app", 8001),
-    ("deposit.main:app", 8002),
-    ("withdraw.main:app", 8003)
+    ("wallet.main:app", 8001),
+    ("auth.main:app", 8002),
+    ("deposit.main:app", 8003),
+    ("withdraw.main:app", 8004)
 ]
 
+# Démarrer le gateway
+subprocess.Popen([
+    "uvicorn", 
+    "main:main_app",
+    "--host", "0.0.0.0",
+    "--port", "8000",
+    "--reload", "false"
+])
+
+# Démarrer les microservices
 for app, port in services:
-    p = Process(target=run_service, args=(app, port))
-    p.start()    
-
-from fastapi.middleware.wsgi import WSGIMiddleware
-from fastapi import FastAPI
-
-from wallet.main import app as wallet
-from authentification.main import app as authentification
-from deposit.main import app as deposit
-from withdraw.main import app as withdraw
-
-main_app = FastAPI()
-
-main_app.mount("/wallet", WSGIMiddleware(wallet))
-main_app.mount("/auth", WSGIMiddleware(authentification))
-main_app.mount("/deposit", WSGIMiddleware(deposit))
-main_app.mount("/withdraw", WSGIMiddleware(withdraw))
+    subprocess.Popen([
+        "uvicorn",
+        app,
+        "--host", "0.0.0.0",
+        "--port", str(port),
+        "--reload", "false"
+    ])
+    time.sleep(1)
