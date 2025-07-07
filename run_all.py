@@ -7,10 +7,10 @@ def run_service(app: str, port: int):
     uvicorn.run(app, host="0.0.0.0", port=port, reload=False, workers=1)
 
 services = [
-    ("wallet:app", 8000),
-    ("authentification:app", 8001),
-    ("deposit:app", 8002),
-    ("withdraw:app", 8003)
+    ("wallet.main:app", 8000),
+    ("authentification.main:app", 8001),
+    ("deposit.main:app", 8002),
+    ("withdraw.main:app", 8003)
 ]
 
 for app, port in services:
