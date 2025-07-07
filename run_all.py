@@ -23,7 +23,6 @@ for app, port in services:
         "uvicorn",
         app,
         "--host", "0.0.0.0",
-        "--port", str(port),
-        "--no-reload"
+        "--port", str(port)
     ])
     time.sleep(1)
