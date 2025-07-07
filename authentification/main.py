@@ -1,5 +1,5 @@
 # authentification/main.py
-from fastapi import FastAPI, Depends, HTTPException, Form, APIRouter
+from fastapi import FastAPI, Depends, HTTPException, Form
 from fastapi.security import OAuth2PasswordRequestForm
 from shared.databases import database
 from shared.models import User
@@ -17,7 +17,8 @@ from pydantic import ConfigDict
 from contextlib import asynccontextmanager
 
 
-app = FastAPI(swagger_ui_init_oauth=None)
+app = FastAPI(root_path="/",
+              swagger_ui_init_oauth=None)
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,8 +27,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],  # Autorise tous les headers, y compris Authorization
 )
-
-router = APIRouter(prefix="/auth")
 
 class UserLogin(BaseModel):
     email: str
