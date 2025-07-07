@@ -24,6 +24,6 @@ for app, port in services:
         app,
         "--host", "0.0.0.0",
         "--port", str(port),
-        "--reload", "false"
+        "--reload=false"
     ])
     time.sleep(1)
