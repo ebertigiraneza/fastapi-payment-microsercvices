@@ -13,8 +13,7 @@ subprocess.Popen([
     "uvicorn", 
     "main:main_app",
     "--host", "0.0.0.0",
-    "--port", "8000",
-    "--reload", "false"
+    "--port", "8000"
 ])
 
 # Démarrer les microservices
