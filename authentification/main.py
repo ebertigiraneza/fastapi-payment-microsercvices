@@ -1,5 +1,5 @@
 # authentification/main.py
-from fastapi import FastAPI, Depends, HTTPException, Form
+from fastapi import FastAPI, Depends, HTTPException, Form, APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from shared.databases import database
 from shared.models import User
@@ -16,8 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import ConfigDict
 from contextlib import asynccontextmanager
 
-
-app = FastAPI(swagger_ui_init_oauth=None)
+app = FastAPI(lifespan=lifespan, swagger_ui_init_oauth=None)
 
 app.add_middleware(
     CORSMiddleware,
@@ -27,6 +26,7 @@ app.add_middleware(
     allow_headers=["*"],  # Autorise tous les headers, y compris Authorization
 )
 
+router = APIRouter()
 class UserLogin(BaseModel):
     email: str
     password: str
@@ -43,10 +43,9 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine) 
     yield
     await database.disconnect()
-    
-app = FastAPI(lifespan=lifespan)    
+    )    
 
-@app.post("/login")
+@router.post("/login")
 async def login(
     username: str = Form(...), 
     password: str = Form(...),
@@ -64,7 +63,7 @@ async def login(
         "token_type": "bearer" 
     }
 
-@app.post("/register")
+@router.post("/register")
 async def register_user(user: UserCreate):
     existing_user = await database.fetch_one(
         User.__table__.select().where(User.username == user.username)
@@ -86,13 +85,15 @@ async def register_user(user: UserCreate):
     
     return {"message": "User created successfully"}
 
-@app.get("/me")
+@router.get("/me")
 async def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
 
-@app.get("/auth/test")
+@router.get("/test")
 async def test():
     return {"message": "Test successful"}
+
+app.include_router(router, prefix="/auth")
 
 from fastapi.openapi.utils import get_openapi
 

@@ -24,8 +24,8 @@ services = {
 
 for name, config in services.items():
     module = import_module(f"{name}.main")
-    app.mount(config["path"], module.app)
-    print(f"Mounted {name} at {config['path']}")
+    app.include_router(module.router, prefix=config["path"])
+    print(f"Included {name} at {config['path']}")
 
 @app.get("/")
 def read_root():
