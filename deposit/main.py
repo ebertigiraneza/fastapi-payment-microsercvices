@@ -1,5 +1,5 @@
 # deposit/main.py
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, APIRouter
 from pydantic import BaseModel
 from shared.databases import database
 from shared.dependances import get_current_user, get_current_wallet
@@ -26,6 +26,8 @@ app.add_middleware(
     allow_headers=["*"],  # Autorise tous les headers, y compris Authorization
 )
 
+router = APIRouter(prefix="/wallet")
+
 class DepositRequest(BaseModel):
     source_wallet: str
     target_wallet: str
@@ -39,7 +41,7 @@ async def lifespan(app: FastAPI):
     
 app = FastAPI(lifespan=lifespan)   
 
-@app.post("/Wallet/deposit")
+@app.post("/deposit")
 async def deposit(request: DepositRequest):
     
     status_default = "completed"

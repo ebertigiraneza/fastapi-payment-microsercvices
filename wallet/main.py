@@ -1,5 +1,5 @@
 # wallet/main.py
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from shared.databases import database
 from shared.models import Wallet
@@ -25,6 +25,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+router = APIRouter(prefix="/wallet")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await database.connect()
@@ -45,13 +47,13 @@ def generate_address(length: int = 40) -> str:
     characters = string.ascii_letters + string.digits
     return ''.join(secrets.choice(characters) for _ in range(length))
 
-@app.get("/Wallet", response_model=list[WalletResponse])
+@app.get("/", response_model=list[WalletResponse])
 async def get_Wallets(current_user: User = Depends(get_current_user)):
     query = Wallet.__table__.select().where(Wallet.user_id == current_user.id)
     records = await database.fetch_all(query)
     return [WalletResponse(**dict(record)) for record in records]
 
-@app.post("/Wallet/create")
+@app.post("/create")
 async def create_new_Wallet(current_user: User = Depends(get_current_user)):
     id = str(uuid.uuid4())
     address = generate_address()
@@ -92,7 +94,7 @@ async def create_new_Wallet(current_user: User = Depends(get_current_user)):
     
     return {"address": address, "password": password}
 
-@app.post("/Wallet/get_access/{address}", response_model=BalanceResponse)
+@app.post("/get_access/{address}", response_model=BalanceResponse)
 async def get_access(
     address: str, 
     wallet_auth: WalletAuth,

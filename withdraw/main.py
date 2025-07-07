@@ -1,5 +1,5 @@
 # withdraw/main.py
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, APIRouter
 from pydantic import BaseModel
 from shared.databases import database
 from shared.models import Wallet, Transaction
@@ -26,6 +26,8 @@ app.add_middleware(
     allow_headers=["*"],  # Autorise tous les headers, y compris Authorization
 )
 
+router = APIRouter(prefix="/wallet")
+
 class WithdrawRequest(BaseModel):
     target_wallet: str 
     local_wallet: str  
@@ -42,7 +44,7 @@ app = FastAPI(lifespan=lifespan)
 
 # ----------------------------------------------------------- Withdraw -----------------------------------------------------------
 
-@app.post("/Wallet/withdraw")
+@app.post("/withdraw")
 async def withdraw(
     request: WithdrawRequest,
 ):
