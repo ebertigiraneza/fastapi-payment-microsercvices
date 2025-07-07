@@ -16,7 +16,7 @@ app.add_middleware(
 # Import dynamique des sous-applications
 services = {
     "wallet": {"port": 8001, "path": "/wallet"},
-    "auth": {"port": 8002, "path": "/auth"},
+    "authentification": {"port": 8002, "path": "/auth"},
     "deposit": {"port": 8003, "path": "/deposit"},
     "withdraw": {"port": 8004, "path": "/withdraw"}
 }
