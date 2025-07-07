@@ -17,7 +17,7 @@ from pydantic import ConfigDict
 from contextlib import asynccontextmanager
 
 
-app = FastAPI(root_path="/authentification", swagger_ui_init_oauth=None)
+app = FastAPI(swagger_ui_init_oauth=None)
 
 app.add_middleware(
     CORSMiddleware,
