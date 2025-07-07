@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from importlib import import_module
+import uvicorn
 
 main_app = FastAPI()
 
@@ -28,3 +29,6 @@ for name, config in services.items():
 @main_app.get("/")
 def read_root():
     return {"message": "API Gateway", "services": list(services.keys())}
+
+if __name__ == "__main__":
+    uvicorn.run(main_app, host="0.0.0.0", port=8000)
