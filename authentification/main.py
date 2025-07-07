@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine) 
     yield
     await database.disconnect()
-    )    
+        
 
 @router.post("/login")
 async def login(
