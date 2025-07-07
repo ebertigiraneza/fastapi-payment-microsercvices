@@ -1,6 +1,5 @@
 # run_all.py
 
-
 import uvicorn
 from multiprocessing import Process
 import time
