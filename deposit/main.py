@@ -13,6 +13,7 @@ import uuid
 import httpx
 
 app = FastAPI(
+    root_path="/deposit",
     title="API PAYMENT DEPOSIT",
     description="Microservice de dépôt",
     version="1.0",

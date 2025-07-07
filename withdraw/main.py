@@ -15,6 +15,7 @@ from shared.security import settings
 import httpx
 
 app = FastAPI(
+    root_path="/withdraw",
     swagger_ui_init_oauth=None,
 )
 

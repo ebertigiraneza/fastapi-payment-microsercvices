@@ -14,6 +14,7 @@ from shared.models import User, Wallet
 from contextlib import asynccontextmanager
 
 app = FastAPI(
+    root_path="/wallet",
     swagger_ui_init_oauth=None,
 )
 
