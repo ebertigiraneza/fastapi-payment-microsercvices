@@ -12,7 +12,14 @@ from contextlib import asynccontextmanager
 import uuid
 import httpx
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await database.connect()
+    yield
+    await database.disconnect()
+
 app = FastAPI(
+    lifespan=lifespan,
     title="API PAYMENT DEPOSIT",
     description="Microservice de dépôt",
     version="1.0",
@@ -26,22 +33,14 @@ app.add_middleware(
     allow_headers=["*"],  # Autorise tous les headers, y compris Authorization
 )
 
-router = APIRouter(prefix="/wallet")
+router = APIRouter(tags=["Deposit"])
 
 class DepositRequest(BaseModel):
     source_wallet: str
     target_wallet: str
     amount: float
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    await database.connect()
-    yield
-    await database.disconnect()
-    
-app = FastAPI(lifespan=lifespan)   
-
-@app.post("/deposit")
+@router.post("/deposit", summary="Effectuer un dépôt sur un portefeuille")
 async def deposit(request: DepositRequest):
     
     status_default = "completed"

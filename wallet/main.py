@@ -13,7 +13,14 @@ from shared.dependances import get_current_user
 from shared.models import User, Wallet
 from contextlib import asynccontextmanager
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await database.connect()
+    yield
+    await database.disconnect()
+
 app = FastAPI(
+    lifespan=lifespan,
     swagger_ui_init_oauth=None,
 )
 
@@ -25,15 +32,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-router = APIRouter(prefix="/wallet")
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    await database.connect()
-    yield
-    await database.disconnect()
-    
-app = FastAPI(lifespan=lifespan)   
+router = APIRouter(tags=["Wallet"])
 
 wordlist = [
     "chat", "arbre", "soleil", "lune", "rivière", "montagne", "neige", "voiture",
@@ -47,13 +46,13 @@ def generate_address(length: int = 40) -> str:
     characters = string.ascii_letters + string.digits
     return ''.join(secrets.choice(characters) for _ in range(length))
 
-@app.get("/", response_model=list[WalletResponse])
+@router.get("/", response_model=list[WalletResponse], summary="Obtenir la liste des portefeuilles")
 async def get_Wallets(current_user: User = Depends(get_current_user)):
     query = Wallet.__table__.select().where(Wallet.user_id == current_user.id)
     records = await database.fetch_all(query)
     return [WalletResponse(**dict(record)) for record in records]
 
-@app.post("/create")
+@router.post("/create", summary="Créer un nouveau portefeuille")
 async def create_new_Wallet(current_user: User = Depends(get_current_user)):
     id = str(uuid.uuid4())
     address = generate_address()
@@ -94,7 +93,7 @@ async def create_new_Wallet(current_user: User = Depends(get_current_user)):
     
     return {"address": address, "password": password}
 
-@app.post("/get_access/{address}", response_model=BalanceResponse)
+@router.post("/get_access/{address}", response_model=BalanceResponse, summary="Obtenir l'accès à un portefeuille")
 async def get_access(
     address: str, 
     wallet_auth: WalletAuth,

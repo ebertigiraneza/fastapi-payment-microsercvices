@@ -14,7 +14,16 @@ from shared.databases import engine, Base
 from shared.security import settings
 import httpx
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await database.connect()
+    Base.metadata.create_all(bind=engine) 
+    yield
+    await database.disconnect()
+
 app = FastAPI(
+    lifespan=lifespan,
     swagger_ui_init_oauth=None,
 )
 
@@ -26,25 +35,17 @@ app.add_middleware(
     allow_headers=["*"],  # Autorise tous les headers, y compris Authorization
 )
 
-router = APIRouter(prefix="/wallet")
+router = APIRouter(tags=["Withdraw"])
 
 class WithdrawRequest(BaseModel):
     target_wallet: str 
     local_wallet: str  
     amount: float
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    await database.connect()
-    Base.metadata.create_all(bind=engine) 
-    yield
-    await database.disconnect()
-    
-app = FastAPI(lifespan=lifespan)   
 
 # ----------------------------------------------------------- Withdraw -----------------------------------------------------------
 
-@app.post("/withdraw")
+@router.post("/withdraw", summary="Effectuer un retrait sur un portefeuille")
 async def withdraw(
     request: WithdrawRequest,
 ):
