@@ -16,6 +16,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import ConfigDict
 from contextlib import asynccontextmanager
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await database.connect()
+    Base.metadata.create_all(bind=engine) 
+    yield
+    await database.disconnect()
+
 app = FastAPI(lifespan=lifespan, swagger_ui_init_oauth=None)
 
 app.add_middleware(
@@ -30,20 +37,6 @@ router = APIRouter()
 class UserLogin(BaseModel):
     email: str
     password: str
-    
-class UserCreate(BaseModel):
-    username: str
-    email: str
-    password: str
-    model_config = ConfigDict(from_attributes=True)
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    await database.connect()
-    Base.metadata.create_all(bind=engine) 
-    yield
-    await database.disconnect()
-        
 
 @router.post("/login")
 async def login(
