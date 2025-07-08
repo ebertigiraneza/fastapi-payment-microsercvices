@@ -33,7 +33,7 @@ app.add_middleware(
     allow_headers=["*"],  # Autorise tous les headers, y compris Authorization
 )
 
-router = APIRouter()
+router = APIRouter(tags=["Authentication"])
 class UserLogin(BaseModel):
     email: str
     password: str
@@ -44,7 +44,7 @@ class UserCreate(BaseModel):
     password: str
     model_config = ConfigDict(from_attributes=True)
 
-@router.post("/login")
+@router.post("/login", summary="User Login")
 async def login(
     username: str = Form(...), 
     password: str = Form(...),
@@ -62,7 +62,7 @@ async def login(
         "token_type": "bearer" 
     }
 
-@router.post("/register")
+@router.post("/register", summary="Register a new user")
 async def register_user(user: UserCreate):
     existing_user = await database.fetch_one(
         User.__table__.select().where(User.username == user.username)
@@ -84,11 +84,11 @@ async def register_user(user: UserCreate):
     
     return {"message": "User created successfully"}
 
-@router.get("/me")
+@router.get("/me", summary="Get Current User")
 async def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
 
-@router.get("/test")
+@router.get("/test", summary="Test Endpoint")
 async def test():
     return {"message": "Test successful"}
 

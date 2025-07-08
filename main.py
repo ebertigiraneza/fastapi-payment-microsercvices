@@ -16,20 +16,48 @@ app.add_middleware(
 
 # Import dynamique des sous-applications
 services = {
-    "wallet": {"port": 8001, "path": "/wallet"},
-    "authentification": {"port": 8002, "path": "/auth"},
-    "deposit": {"port": 8003, "path": "/deposit"},
-    "withdraw": {"port": 8004, "path": "/withdraw"}
+    "authentification": {"prefix": "/auth", "router_name": "router"},
+    "wallet": {"prefix": "/wallet", "router_name": "router"},
+    "deposit": {"prefix": "/deposit", "router_name": "router"},
+    "withdraw": {"prefix": "/withdraw", "router_name": "router"}
 }
 
 for name, config in services.items():
     module = import_module(f"{name}.main")
-    app.include_router(module.router, prefix=config["path"])
-    print(f"Included {name} at {config['path']}")
+    router = getattr(module, config["router_name"])
+    app.include_router(router, prefix=config["prefix"])
+    print(f"Included {name} at {config['prefix']}")
 
 @app.get("/")
 def read_root():
     return {"message": "API Gateway", "services": list(services.keys())}
 
+from fastapi.openapi.utils import get_openapi
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    
+    openapi_schema = get_openapi(
+        title="Payment System API",
+        version="1.0",
+        routes=app.routes,
+    )
+    
+    # Configuration pour regrouper les docs par service
+    openapi_schema["tags"] = [
+        {"name": "Authentication", "description": "User authentication endpoints"},
+        {"name": "Wallet", "description": "Wallet management endpoints"},
+        {"name": "Deposit", "description": "Deposit operations"},
+        {"name": "Withdraw", "description": "Withdrawal operations"},
+    ]
+    
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+    
+    
