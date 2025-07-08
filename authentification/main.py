@@ -37,6 +37,12 @@ router = APIRouter()
 class UserLogin(BaseModel):
     email: str
     password: str
+    
+class UserCreate(BaseModel):
+    username: str
+    email: str
+    password: str
+    model_config = ConfigDict(from_attributes=True)
 
 @router.post("/login")
 async def login(
