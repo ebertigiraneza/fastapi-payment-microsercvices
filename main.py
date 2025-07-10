@@ -39,7 +39,7 @@ def custom_openapi():
         return app.openapi_schema
     
     openapi_schema = get_openapi(
-        title="Payment System API",
+        title="Transaction System API",
         version="1.0",
         routes=app.routes,
     )
