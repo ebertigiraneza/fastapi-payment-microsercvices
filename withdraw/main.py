@@ -45,9 +45,10 @@ class WithdrawRequest(BaseModel):
 
 # ----------------------------------------------------------- Withdraw -----------------------------------------------------------
 
-@router.post("/withdraw", summary="Effectuer un retrait sur un portefeuille", user = Depends(get_current_user)
+@router.post("/withdraw", summary="Effectuer un retrait sur un portefeuille")
 async def withdraw(
     request: WithdrawRequest,
+    current_user: User = Depends(get_current_user)
 ):
     status_default = "completed"
     wallet_password_check = await database.fetch_one(
